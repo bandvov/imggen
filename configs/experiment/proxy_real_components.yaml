@@ -1,0 +1,12 @@
+# Same proxy backbone as proxy_baseline.yaml, but with real pretrained components (ADR 0013)
+# instead of the toy/hash placeholders. See configs/components/sd_vae_t5.yaml for requirements.
+base:
+  - ../base.yaml
+  - ../backbone/dit.yaml
+  - ../components/sd_vae_t5.yaml
+
+run:
+  name: proxy_real_components
+
+backbone:
+  size: proxy

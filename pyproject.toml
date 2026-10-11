@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "imggen"
+version = "0.1.0"
+description = "Fast, low-resource image generation model"
+requires-python = ">=3.10"
+dependencies = ["pydantic>=2.5", "pyyaml>=6.0", "torch>=2.4"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5", "numpy"]
+# Real pretrained components (ADR 0013): the SD/SDXL VAE (imggen.autoencoders.sd_vae) and a T5
+# text encoder (imggen.text.t5_encoder). Not a core dependency — most of this project (including
+# every default config) uses the toy/hash placeholders from ADR 0006 and never imports these.
+real-components = ["diffusers>=0.27", "transformers>=4.40", "sentencepiece"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+markers = [
+  "slow: long-running tests",
+  "gpu: requires a CUDA device",
+  "dist: requires multiple processes/devices (FSDP/TP parity)",
+  "gate: roadmap step-9 test gate — nothing moves to step 10 until these pass",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]

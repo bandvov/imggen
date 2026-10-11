@@ -1,0 +1,14 @@
+# Backbone shape doesn't matter here; used only by scripts/mup_check.py's --base-width default
+# and as a template for enabling muP in an experiment (`backbone.mup.enabled=true`).
+base:
+  - ../base.yaml
+  - ../backbone/dit.yaml
+
+run:
+  name: mup_check
+
+backbone:
+  size: proxy
+  mup:
+    enabled: true
+    base_width: 384

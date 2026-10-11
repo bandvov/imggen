@@ -1,0 +1,33 @@
+# Real pretrained components (ADR 0013), replacing the "toy"/"hash" placeholders from ADR 0006.
+# Needs: pip install diffusers transformers sentencepiece
+# Needs network access to huggingface.co to download weights on first use (this project's own
+# sandbox doesn't have that; run this on a machine that does).
+#
+# Usage: compose into an experiment config's `base:` list, or pass as extra config files to
+# load_config. backbone.in_channels/text_dim below match stabilityai/sdxl-vae (4 latent
+# channels) and google/t5-v1_1-small (d_model 512) — change both together if you swap either
+# model, since a mismatch is only caught when imggen.data.shards.Manifest.check() runs (at
+# build_dataloader time), not at config-load time.
+autoencoder:
+  name: sd_vae
+  args:
+    model_id: stabilityai/sdxl-vae
+    # subfolder: vae          # set this instead if model_id is a full pipeline repo, not a
+    #                           standalone VAE repo (e.g. runwayml/stable-diffusion-v1-5)
+    dtype: float32
+    sample: false              # deterministic (mode), matching this project's frozen-AE
+    #                           convention (ADR 0006); set true to match how SD itself trains
+
+text_encoder:
+  name: t5
+  args:
+    model_id: google/t5-v1_1-small
+    max_length: 64
+    dtype: float32
+
+backbone:
+  in_channels: 4     # sdxl-vae's latent_channels
+  text_dim: 512       # google/t5-v1_1-small's d_model
+
+data:
+  resolution: 512     # pixel resolution fed to the VAE; latent grid is resolution/8

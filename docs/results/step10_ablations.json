@@ -1,0 +1,47 @@
+[
+  {
+    "group": "attn",
+    "variant": "backbone.attn=softmax",
+    "final_loss": 0.21049842238426208,
+    "tail_avg_loss": 0.2260408006608486,
+    "cpu_seconds_per_step": 0.1251,
+    "total_params": 2753232,
+    "active_params": 2753232
+  },
+  {
+    "group": "attn",
+    "variant": "backbone.attn=linear",
+    "final_loss": 0.20931482315063477,
+    "tail_avg_loss": 0.22321585342288017,
+    "cpu_seconds_per_step": 0.126,
+    "total_params": 2753232,
+    "active_params": 2753232
+  },
+  {
+    "group": "attn",
+    "variant": "backbone.attn=softmax|backbone.attn_pattern=[linear,linear,softmax,linear]",
+    "final_loss": 0.20924052596092224,
+    "tail_avg_loss": 0.22488161101937293,
+    "cpu_seconds_per_step": 0.1237,
+    "total_params": 2753232,
+    "active_params": 2753232
+  },
+  {
+    "group": "ffn",
+    "variant": "backbone.ffn=dense",
+    "final_loss": 0.21049842238426208,
+    "tail_avg_loss": 0.2260408006608486,
+    "cpu_seconds_per_step": 0.1239,
+    "total_params": 2753232,
+    "active_params": 2753232
+  },
+  {
+    "group": "ffn",
+    "variant": "backbone.ffn=moe|backbone.moe={\"num_experts\": 8, \"top_k\": 2, \"shared_experts\": 1}",
+    "final_loss": 0.21222831308841705,
+    "tail_avg_loss": 0.2173882395029068,
+    "cpu_seconds_per_step": 0.173,
+    "total_params": 5130960,
+    "active_params": 2760912
+  }
+]

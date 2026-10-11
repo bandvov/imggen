@@ -1,0 +1,12 @@
+# Same DiT with a sparse MoE FFN: 8 experts, top-2, one shared expert (about equal active FLOPs).
+base:
+  - dit.yaml
+
+backbone:
+  ffn: moe
+  moe:
+    num_experts: 8
+    top_k: 2
+    shared_experts: 1
+    balance: aux_loss
+    aux_loss_weight: 0.01

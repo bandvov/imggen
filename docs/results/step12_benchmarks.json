@@ -1,0 +1,74 @@
+[
+  {
+    "device": "cpu",
+    "latency_s_per_step": 0.961,
+    "throughput_samples_per_s": 8.32,
+    "peak_vram_mb": null,
+    "total_params": 6966816,
+    "total_params_fmt": "6.97M",
+    "active_params": 6966816,
+    "config": {
+      "width": 256,
+      "depth": 6,
+      "attn": "softmax",
+      "ffn": "dense",
+      "batch_size": 8,
+      "resolution": 16,
+      "world_size": 1
+    }
+  },
+  {
+    "device": "cpu",
+    "latency_s_per_step": 0.884,
+    "throughput_samples_per_s": 9.05,
+    "peak_vram_mb": null,
+    "total_params": 6966816,
+    "total_params_fmt": "6.97M",
+    "active_params": 6966816,
+    "config": {
+      "width": 256,
+      "depth": 6,
+      "attn": "linear",
+      "ffn": "dense",
+      "batch_size": 8,
+      "resolution": 16,
+      "world_size": 1
+    }
+  },
+  {
+    "device": "cpu",
+    "latency_s_per_step": 0.9482,
+    "throughput_samples_per_s": 8.44,
+    "peak_vram_mb": null,
+    "total_params": 6966816,
+    "total_params_fmt": "6.97M",
+    "active_params": 6966816,
+    "config": {
+      "width": 256,
+      "depth": 6,
+      "attn": "softmax",
+      "ffn": "dense",
+      "batch_size": 8,
+      "resolution": 16,
+      "world_size": 1
+    }
+  },
+  {
+    "device": "cpu",
+    "latency_s_per_step": 1.0531,
+    "throughput_samples_per_s": 7.6,
+    "peak_vram_mb": null,
+    "total_params": 13147392,
+    "total_params_fmt": "13.1M",
+    "active_params": 6932928,
+    "config": {
+      "width": 256,
+      "depth": 6,
+      "attn": "softmax",
+      "ffn": "moe",
+      "batch_size": 8,
+      "resolution": 16,
+      "world_size": 1
+    }
+  }
+]

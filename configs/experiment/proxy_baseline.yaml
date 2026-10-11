@@ -1,0 +1,9 @@
+base:
+  - ../base.yaml
+  - ../backbone/dit.yaml
+
+run:
+  name: proxy_baseline
+
+backbone:
+  size: proxy

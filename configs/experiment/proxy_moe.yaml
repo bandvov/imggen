@@ -1,0 +1,9 @@
+base:
+  - ../base.yaml
+  - ../backbone/dit_moe.yaml
+
+run:
+  name: proxy_moe
+
+backbone:
+  size: proxy

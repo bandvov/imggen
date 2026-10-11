@@ -1,0 +1,33 @@
+run:
+  name: debug
+  seed: 0
+  output_dir: runs
+
+# "toy" and "hash" are untrained placeholders (no network access to real pretrained weights);
+# swap in a real AE / text encoder by registering it under a new name (see ADR 0006).
+autoencoder:
+  name: toy
+  args:
+    latent_channels: 32
+    num_downsamples: 3
+text_encoder:
+  name: hash
+  args:
+    text_dim: 2048
+objective:
+  name: flow_matching
+
+data:
+  root: data/latents
+  resolution: 64
+  num_workers: 4
+  shard_size: 256
+
+train:
+  steps: 1000
+  batch_size: 32
+  lr: 1.0e-4
+  precision: bf16
+
+parallel:
+  strategy: none

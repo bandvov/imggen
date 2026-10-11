@@ -1,0 +1,107 @@
+[
+  {
+    "knob": "train.lr",
+    "value": 0.0003,
+    "final_loss": 0.5660154223442078,
+    "tail_avg_loss": 0.5343332648277282,
+    "seconds": 25.51
+  },
+  {
+    "knob": "train.lr",
+    "value": 0.001,
+    "final_loss": 0.30293166637420654,
+    "tail_avg_loss": 0.243246927857399,
+    "seconds": 23.85
+  },
+  {
+    "knob": "train.lr",
+    "value": 0.003,
+    "final_loss": 0.2582013010978699,
+    "tail_avg_loss": 0.19366637021303176,
+    "seconds": 24.12
+  },
+  {
+    "knob": "train.lr",
+    "value": 0.01,
+    "final_loss": 0.38660794496536255,
+    "tail_avg_loss": 0.35916663706302643,
+    "seconds": 24.09
+  },
+  {
+    "knob": "train.weight_decay",
+    "value": 0.0,
+    "final_loss": 0.2582013010978699,
+    "tail_avg_loss": 0.19366637021303176,
+    "seconds": 33.19
+  },
+  {
+    "knob": "train.weight_decay",
+    "value": 0.01,
+    "final_loss": 0.2581881582736969,
+    "tail_avg_loss": 0.193650284409523,
+    "seconds": 21.65
+  },
+  {
+    "knob": "train.weight_decay",
+    "value": 0.1,
+    "final_loss": 0.25809046626091003,
+    "tail_avg_loss": 0.1935255378484726,
+    "seconds": 21.53
+  },
+  {
+    "knob": "train.warmup_steps",
+    "value": 1,
+    "final_loss": 0.266983300447464,
+    "tail_avg_loss": 0.20262673050165175,
+    "seconds": 22.74
+  },
+  {
+    "knob": "train.warmup_steps",
+    "value": 5,
+    "final_loss": 0.26146912574768066,
+    "tail_avg_loss": 0.1969059571623802,
+    "seconds": 26.91
+  },
+  {
+    "knob": "train.warmup_steps",
+    "value": 20,
+    "final_loss": 0.2712743580341339,
+    "tail_avg_loss": 0.21048389971256257,
+    "seconds": 23.69
+  },
+  {
+    "knob": "train.batch_size",
+    "value": 4,
+    "final_loss": 0.24854221940040588,
+    "tail_avg_loss": 0.311604243516922,
+    "seconds": 4.29
+  },
+  {
+    "knob": "train.batch_size",
+    "value": 8,
+    "final_loss": 0.12793587148189545,
+    "tail_avg_loss": 0.22293687984347343,
+    "seconds": 6.3
+  },
+  {
+    "knob": "train.batch_size",
+    "value": 16,
+    "final_loss": 0.1868380904197693,
+    "tail_avg_loss": 0.22704958021640778,
+    "seconds": 11.53
+  },
+  {
+    "knob": "objective.args.t_dist",
+    "value": "uniform",
+    "final_loss": 0.12793587148189545,
+    "tail_avg_loss": 0.22293687984347343,
+    "seconds": 8.05
+  },
+  {
+    "knob": "objective.args.t_dist",
+    "value": "logit_normal",
+    "final_loss": 0.1366713047027588,
+    "tail_avg_loss": 0.14705760776996613,
+    "seconds": 7.33
+  }
+]
