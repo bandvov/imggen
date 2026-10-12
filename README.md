@@ -19,6 +19,8 @@ python scripts/sample.py <run_dir>/checkpoints/step_N <config> \
     --caption "a red circle" --ae-weights /tmp/toy_ae.pt --guidance-scale 4 --out /tmp/sample.pt
 python scripts/precompute.py configs/experiment/proxy_baseline.yaml \
     data.root=/tmp/cache --num-samples 512   # cache latents + text embeddings once
+python scripts/precompute.py configs/experiment/proxy_baseline.yaml \
+    data.root=/tmp/cache --num-samples 512 --resume   # continue after an interruption
 python scripts/train.py configs/experiment/proxy_baseline.yaml data.root=/tmp/cache
 python scripts/train.py configs/experiment/proxy_baseline.yaml data.root=/tmp/cache \
     --run-dir runs/proxy_baseline/<ts>_<hash> train.steps=2000   # resume, more steps

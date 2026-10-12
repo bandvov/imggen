@@ -15,10 +15,17 @@ from imggen.data.shards import (
     LatentShardDataset,
     Manifest,
     ManifestMismatch,
+    ResumeMismatch,
     ShardWriter,
+    check_resume_meta,
+    clear_resume_meta,
     collate_latents,
+    find_resume_point,
     has_null_embedding,
     load_null_embedding,
+    load_resume_meta,
+    save_resume_meta,
+    validate_shard,
 )
 from imggen.data.toy_dataset import ToyShapesDataset
 from imggen.registry import AUTOENCODER, TEXT_ENCODER
@@ -362,3 +369,126 @@ def test_build_autoencoder_loads_weights_path_and_pops_it_from_args():
 def test_build_autoencoder_without_weights_path_is_unaffected():
     ae = build_autoencoder(ComponentConfig(name="toy", args={"latent_channels": 4}))
     assert isinstance(ae, ToyAutoencoder)
+
+
+# ---------------------------------------------------------------- resume (interrupted precompute)
+
+
+def test_validate_shard_accepts_a_well_formed_shard(tmp_path):
+    _write_shards(tmp_path, n=5, shard_size=5)
+    shard = sorted(tmp_path.glob("shard-*.tar"))[0]
+    assert validate_shard(shard) == 5
+
+
+def test_validate_shard_rejects_a_truncated_file(tmp_path):
+    _write_shards(tmp_path, n=5, shard_size=5)
+    shard = sorted(tmp_path.glob("shard-*.tar"))[0]
+    data = shard.read_bytes()
+    shard.write_bytes(data[: len(data) // 2])  # simulate a kill mid-write
+    assert validate_shard(shard) is None
+
+
+def test_validate_shard_rejects_an_incomplete_triplet(tmp_path):
+    import tarfile
+
+    path = tmp_path / "shard-00000.tar"
+    with tarfile.open(path, "w") as tar:
+        import io
+
+        data = b"{}"
+        info = tarfile.TarInfo("0000.json")
+        info.size = len(data)
+        tar.addfile(info, io.BytesIO(data))
+        # no 0000.latent.pth or 0000.text_emb.pth -> incomplete triplet
+    assert validate_shard(path) is None
+
+
+def test_validate_shard_missing_file_returns_none(tmp_path):
+    assert validate_shard(tmp_path / "does-not-exist.tar") is None
+
+
+def test_find_resume_point_no_directory(tmp_path):
+    assert find_resume_point(tmp_path / "nope") == (0, 0)
+
+
+def test_find_resume_point_empty_directory(tmp_path):
+    assert find_resume_point(tmp_path) == (0, 0)
+
+
+def test_find_resume_point_all_shards_complete(tmp_path):
+    num_shards, lengths = _write_shards(tmp_path, n=7, shard_size=3)
+    assert find_resume_point(tmp_path) == (num_shards, 7)
+
+
+def test_find_resume_point_discards_a_truncated_last_shard(tmp_path):
+    _write_shards(tmp_path, n=7, shard_size=3)  # shards: [3, 3, 1] samples
+    shards = sorted(tmp_path.glob("shard-*.tar"))
+    assert len(shards) == 3
+    last = shards[-1]
+    data = last.read_bytes()
+    last.write_bytes(data[: len(data) // 2])
+
+    next_shard_idx, done = find_resume_point(tmp_path)
+    assert next_shard_idx == 2  # resume at the (now-deleted) last shard's index
+    assert done == 6  # the two earlier, valid shards' samples
+    assert not last.exists()  # the untrustworthy tail was discarded
+
+
+def test_find_resume_point_raises_if_a_non_last_shard_is_corrupt(tmp_path):
+    _write_shards(tmp_path, n=7, shard_size=3)
+    shards = sorted(tmp_path.glob("shard-*.tar"))
+    middle = shards[1]
+    data = middle.read_bytes()
+    middle.write_bytes(data[: len(data) // 2])
+    with pytest.raises(ValueError, match="not the last shard"):
+        find_resume_point(tmp_path)
+
+
+def test_shard_writer_continues_numbering_from_start_params(tmp_path):
+    _write_shards(tmp_path, n=6, shard_size=3)  # shard-00000, shard-00001 exist, 6 samples done
+    writer = ShardWriter(tmp_path, shard_size=3, start_shard_idx=2, start_num_samples=6)
+    mask = torch.ones(2, dtype=torch.bool)
+    writer.add("00006", torch.zeros(4, 2, 2), torch.randn(2, 6), mask, "c6")
+    writer.add("00007", torch.zeros(4, 2, 2), torch.randn(2, 6), mask, "c7")
+    num_shards = writer.close()
+    assert num_shards == 3  # the two existing + one new, not restarting from 0
+    assert writer.num_samples == 8
+    # earlier shards untouched
+    assert validate_shard(sorted(tmp_path.glob("shard-*.tar"))[0]) == 3
+    assert validate_shard(sorted(tmp_path.glob("shard-*.tar"))[2]) == 2
+
+
+def test_resume_meta_roundtrip_and_clear(tmp_path):
+    assert load_resume_meta(tmp_path) is None
+    save_resume_meta(tmp_path, num_samples=10, dataset_seed=0)
+    assert load_resume_meta(tmp_path) == {"num_samples": 10, "dataset_seed": 0}
+    clear_resume_meta(tmp_path)
+    assert load_resume_meta(tmp_path) is None
+
+
+def test_resume_meta_creates_the_directory_if_missing(tmp_path):
+    root = tmp_path / "nested" / "cache"
+    save_resume_meta(root, num_samples=5)
+    assert load_resume_meta(root) == {"num_samples": 5}
+
+
+def test_check_resume_meta_passes_when_nothing_saved_yet(tmp_path):
+    check_resume_meta(tmp_path, num_samples=10)  # no file -> nothing to check, no raise
+
+
+def test_check_resume_meta_passes_on_matching_settings(tmp_path):
+    save_resume_meta(tmp_path, num_samples=10, dataset_seed=0, autoencoder={"name": "toy"})
+    check_resume_meta(tmp_path, num_samples=10, dataset_seed=0, autoencoder={"name": "toy"})
+
+
+def test_check_resume_meta_raises_on_mismatch():
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as d:
+        save_resume_meta(d, num_samples=10, dataset_seed=0)
+        with pytest.raises(ResumeMismatch, match="num_samples"):
+            check_resume_meta(d, num_samples=20, dataset_seed=0)
+
+
+def test_clear_resume_meta_is_a_no_op_if_nothing_to_clear(tmp_path):
+    clear_resume_meta(tmp_path)  # must not raise
