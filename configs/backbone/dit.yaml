@@ -4,5 +4,5 @@ backbone:
   head_dim: 64
   attn: softmax          # per-layer mix: attn_pattern: [linear, linear, linear, softmax]
   ffn: dense
-  in_channels: 32        # must match the autoencoder's latent channels
+  in_channels: 4        # must match the autoencoder's latent channels
   text_dim: 2048         # must match the text encoder's embedding size
